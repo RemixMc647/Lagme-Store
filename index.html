@@ -68,18 +68,9 @@
   </div>
 </header>
 
-<!-- ============ HERO ============ -->
-<section class="hero">
-  <div class="hero-spark" aria-hidden="true"></div>
-  <div class="hero-inner">
-    <p class="hero-eyebrow">Beauty, Style &amp; More For You</p>
-    <h1>All You Need,<br>All In One Place.</h1>
-    <p class="hero-sub">Cosmetics, toiletries, footwear, makeup, clothing, perfume and phone accessories — quality products at affordable prices.</p>
-    <div class="hero-actions">
-      <a href="#catalog" class="btn btn-primary">Shop the catalog</a>
-      <a href="https://wa.me/2348068418941" target="_blank" rel="noopener" class="btn btn-ghost">Order on WhatsApp</a>
-    </div>
-  </div>
+<!-- ============ HERO / BANNER CAROUSEL ============ -->
+<section class="hero" id="heroCarousel">
+  <!-- slides filled by JS from BANNER_SLIDES -->
 </section>
 
 <!-- ============ TRUST STRIP ============ -->
@@ -89,6 +80,26 @@
     <span>Affordable Prices</span>
     <span>Reliable Service</span>
     <span>Shop With Confidence</span>
+  </div>
+</section>
+
+<!-- ============ CATEGORY ICON GRID ============ -->
+<section class="category-grid-section">
+  <div class="category-grid" id="categoryGrid">
+    <!-- filled by JS -->
+  </div>
+</section>
+
+<!-- ============ FLASH SALE ============ -->
+<section class="flash-sale" id="flashSale" hidden>
+  <div class="flash-sale-inner">
+    <div class="flash-sale-head">
+      <h2><span class="flash-bolt">⚡</span> Flash Sale</h2>
+      <div class="flash-sale-timer" id="flashSaleTimer"></div>
+    </div>
+    <div class="flash-sale-grid" id="flashSaleGrid">
+      <!-- filled by JS -->
+    </div>
   </div>
 </section>
 
@@ -166,6 +177,15 @@
     <!-- filled by JS -->
   </div>
   <div class="cart-footer">
+    <div class="coupon-row">
+      <input type="text" id="cartCouponInput" class="coupon-input" placeholder="Coupon code" autocapitalize="characters" />
+      <button class="btn btn-ghost btn-small" id="cartCouponApplyBtn" type="button">Apply</button>
+    </div>
+    <p class="coupon-message" id="cartCouponMessage" hidden></p>
+    <div class="cart-total-row coupon-discount-row" id="cartDiscountRow" hidden>
+      <span>Discount</span>
+      <span id="cartDiscountAmount">₦0</span>
+    </div>
     <div class="cart-total-row">
       <span>Total</span>
       <span id="cartTotal">₦0</span>
@@ -272,6 +292,10 @@
         <textarea id="checkoutAddress" rows="2" required></textarea>
       </label>
     </form>
+    <div class="checkout-total-row coupon-discount-row" id="checkoutDiscountRow" hidden>
+      <span>Discount<span id="checkoutCouponCode"></span></span>
+      <span id="checkoutDiscountAmount">₦0</span>
+    </div>
     <div class="checkout-total-row">
       <span>Total</span>
       <span id="checkoutSummaryTotal">₦0</span>
