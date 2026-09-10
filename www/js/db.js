@@ -174,3 +174,7 @@ LG.loadSavedCart = async function (uid) {
 LG.saveCart = function (uid, items) {
   return db.collection("carts").doc(uid).set({ items }, { merge: true });
 };
+// ---------- Order cancellation (customer, while still pending) ----------
+LG.cancelOrder = function (orderId) {
+  return db.collection("orders").doc(orderId).update({ status: "cancelled" });
+};
