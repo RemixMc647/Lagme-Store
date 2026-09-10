@@ -18,7 +18,11 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+}
 
 body {
   margin: 0;
@@ -26,6 +30,8 @@ body {
   color: var(--text);
   background: var(--bg);
   line-height: 1.5;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 h1, h2, h3, .logo-text {
@@ -851,140 +857,37 @@ button {
   .category-bar { top: 61px; }
 }
 
-/* ================================================
-   NEW: search/sort, wishlist, ratings, reviews,
-   checkout modal, order history, admin link
-   ================================================ */
+/* ---------- Small phones (Android/iOS, ~360-480px wide) ---------- */
+@media (max-width: 480px) {
+  .header-inner { padding: 0.7rem 0.9rem; }
+  .logo-badge { width: 34px; height: 34px; }
+  .logo-text { font-size: 1.05rem; }
+  .header-actions { gap: 0.15rem; }
+  .icon-btn { padding: 0.3rem; }
+  .icon-btn svg { width: 19px; height: 19px; }
+  /* The Facebook link is duplicated in the nav menu — drop it from the
+     cramped header row on very small screens rather than let it overflow. */
+  .header-actions .facebook-link { display: none; }
+  .category-bar { top: 54px; }
 
-/* ---------- Search + sort ---------- */
-.search-sort-row {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem 1rem;
-  display: flex;
-  gap: 0.7rem;
-  flex-wrap: wrap;
-}
-.search-input {
-  flex: 1 1 240px;
-  padding: 0.6rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 0.9rem;
-  background: var(--card-bg);
-  color: var(--text);
-}
-.search-input:focus { outline: none; border-color: var(--gold); }
-.sort-select {
-  padding: 0.6rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 0.85rem;
-  background: var(--card-bg);
-  color: var(--text);
-}
+  .hero { min-height: 300px; }
+  .hero-slide { padding: 2.4rem 1rem 3.2rem; }
+  .hero h1 { font-size: 1.7rem; }
+  .hero-sub { font-size: 0.92rem; margin-bottom: 1.3rem; }
+  .hero-actions .btn { padding: 0.7rem 1.2rem; font-size: 0.88rem; }
 
-/* ---------- Wishlist heart ---------- */
-.wish-btn {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  z-index: 2;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--text-soft);
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
-}
-.wish-btn.active { color: #C0392B; }
-.badge.out-of-stock { top: auto; bottom: 0.6rem; background: var(--black); color: #fff; }
+  .promo-strip { font-size: 0.72rem; }
+  .trust-strip-inner { font-size: 0.75rem; gap: 0.6rem 1.1rem; padding: 0.7rem 1rem; }
 
-.qv-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.qv-actions .btn { flex: 1 1 auto; }
-.wish-toggle.active { color: #C0392B; border-color: #C0392B; }
+  .category-grid-section { padding: 1.1rem 1rem 0.2rem; }
+  .category-grid { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 0.6rem; }
+  .category-tile { padding: 0.7rem 0.3rem; }
+  .category-tile-icon { width: 42px; height: 42px; font-size: 1.4rem; }
+  .category-tile-label { font-size: 0.7rem; }
 
-/* ---------- Ratings ---------- */
-.rating-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; }
-.stars { color: var(--gold); letter-spacing: 1px; }
-.rating-count { color: var(--text-soft); font-size: 0.78rem; }
-.no-reviews { color: var(--text-soft); font-size: 0.85rem; }
+  .flash-sale { padding: 0 1rem; }
+  .flash-sale-inner { padding: 1.1rem 1rem 1.3rem; }
+  .flash-sale-head h2 { font-size: 1.05rem; }
+  .flash-sale-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
 
-/* ---------- Reviews ---------- */
-.qv-reviews { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
-.qv-reviews h4 { margin-bottom: 0.6rem; }
-.review-item { padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
-.review-item:last-of-type { border-bottom: none; }
-.review-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.2rem; }
-.review-author { font-size: 0.82rem; color: var(--text-soft); font-weight: 600; }
-.review-comment { margin: 0; font-size: 0.9rem; }
-.review-form { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.8rem; }
-.review-form select,
-.review-form textarea {
-  width: 100%;
-  padding: 0.6rem 0.7rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 0.9rem;
-  background: var(--card-bg);
-  color: var(--text);
-}
-.review-thanks, .review-signin-note { font-size: 0.85rem; color: var(--text-soft); margin-top: 0.6rem; }
-
-/* ---------- Checkout modal ---------- */
-#checkoutModalOverlay .auth-card { max-width: 420px; }
-.checkout-total-row {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 700;
-  padding: 0.8rem 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  margin: 0.6rem 0 1rem;
-}
-#checkoutModalOverlay .btn { margin-bottom: 0.6rem; }
-
-/* ---------- My orders ---------- */
-.my-orders-heading { margin: 1.2rem 0 0.6rem; font-size: 1rem; }
-.my-orders-list { max-height: 220px; overflow-y: auto; margin-bottom: 1rem; }
-.order-item {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.6rem 0.8rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.85rem;
-}
-.order-item-head { display: flex; justify-content: space-between; align-items: center; }
-.order-id { font-weight: 700; }
-.order-status {
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: var(--bg);
-  color: var(--text-soft);
-  text-transform: uppercase;
-}
-.order-status.status-paid, .order-status.status-confirmed { background: #E7F5EA; color: #2E7D32; }
-.order-status.status-shipped, .order-status.status-processing { background: #E8F0FE; color: #1A56DB; }
-.order-status.status-delivered { background: var(--gold); color: var(--black); }
-.order-status.status-pending { background: var(--champagne); color: var(--black); }
-.order-status.status-cancelled { background: #FBEAEA; color: #C0392B; }
-.order-item-meta { color: var(--text-soft); margin-top: 0.3rem; }
-
-.admin-link {
-  display: block;
-  text-align: center;
-  font-weight: 600;
-  color: var(--gold-dark);
-  margin: 0.8rem 0;
-}
-
-.btn-small { padding: 0.5rem 1rem; font-size: 0.82rem; }
+  
