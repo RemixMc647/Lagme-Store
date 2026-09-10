@@ -63,6 +63,7 @@
   <div class="admin-tabs">
     <button class="admin-tab active" data-tab="products">Products</button>
     <button class="admin-tab" data-tab="orders">Orders</button>
+    <button class="admin-tab" data-tab="coupons">Coupons</button>
   </div>
 
   <!-- ---------- Products tab ---------- -->
@@ -98,7 +99,55 @@
       </table>
     </div>
   </section>
+
+  <!-- ---------- Coupons tab ---------- -->
+  <section class="admin-panel" id="panelCoupons" hidden>
+    <div class="admin-panel-head">
+      <h2>Coupons</h2>
+      <div class="admin-panel-actions">
+        <button class="btn btn-primary btn-small" id="newCouponBtn">+ Add coupon</button>
+      </div>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="couponsTable">
+        <thead>
+          <tr><th>Code</th><th>Discount</th><th>Min spend</th><th>Expires</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody id="couponsTableBody"><!-- filled by JS --></tbody>
+      </table>
+    </div>
+  </section>
 </main>
+
+<!-- ============ COUPON MODAL ============ -->
+<div class="modal-overlay" id="couponModalOverlay">
+  <div class="auth-card" id="couponModalCard" role="dialog" aria-modal="true">
+    <button class="icon-btn close-modal" id="closeCouponModal" aria-label="Close">&times;</button>
+    <h3 class="auth-welcome">Add coupon</h3>
+    <p class="auth-error" id="couponFormError" hidden></p>
+    <form class="auth-form" id="couponForm">
+      <label>Code
+        <input type="text" id="cfCode" required autocapitalize="characters" placeholder="e.g. WELCOME10" />
+      </label>
+      <label>Discount type
+        <select id="cfType">
+          <option value="percent">Percentage off</option>
+          <option value="fixed">Fixed amount off (₦)</option>
+        </select>
+      </label>
+      <label>Discount value
+        <input type="number" id="cfValue" min="1" required />
+      </label>
+      <label>Minimum spend (₦, optional)
+        <input type="number" id="cfMinSpend" min="0" />
+      </label>
+      <label>Expires on (optional)
+        <input type="date" id="cfExpires" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" id="cfSubmitBtn">Save coupon</button>
+    </form>
+  </div>
+</div>
 
 <!-- ============ PRODUCT EDIT MODAL ============ -->
 <div class="modal-overlay" id="productModalOverlay">
@@ -133,6 +182,13 @@
           <option value="Sale">Sale</option>
           <option value="Best Seller">Best Seller</option>
         </select>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="pfFlashSale" />
+        Flash sale (shows a countdown timer on the storefront)
+      </label>
+      <label id="pfSaleEndsWrap" hidden>Flash sale ends
+        <input type="datetime-local" id="pfSaleEnds" />
       </label>
       <label>Description
         <textarea id="pfDescription" rows="2" required></textarea>
