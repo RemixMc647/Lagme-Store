@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Keep this list identical to ADMIN_EMAILS in js/config.js.
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          "adelabuaderemi02@gmail.com",
+          "abdulrazaqqgodwinomeiza1@gmail.com"
+        ];
+    }
+
+    // ---------- Products (public catalog) ----------
+    match /products/{productId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      // Admin can change anything. A signed-in customer may ONLY adjust the
+      // `stock` field (used to decrement inventory after a purchase) — they
+      // can't touch price, name, images, etc.
+      allow update: if isAdmin() ||
+        (request.auth != null &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(["stock"]));
+
+      // ---------- Reviews (per product) ----------
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if request.auth != null &&
+          request.resource.data.userId == request.auth.uid;
+        allow update, delete: if request.auth != null &&
+          (resource.data.userId == request.auth.uid || isAdmin());
+      }
+    }
+
+    // ---------- Orders ----------
+    match /orders/{orderId} {
+      // A customer can create their own order, and read their own orders.
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      // Admin can change anything. A signed-in customer may ONLY cancel
+      // their own order, and only while it's still pending — they can't
+      // touch items, price, or jump to any other status.
+      allow update: if isAdmin() ||
+        (request.auth != null &&
+         resource.data.userId == request.auth.uid &&
+         resource.data.status == 'pending' &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+         request.resource.data.status == 'cancelled');
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Wishlist (private, one doc per customer) ----------
+    match /wishlists/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ---------- Saved cart (private, one doc per customer) ----------
+    match /carts/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ---------- Coupons (public read for validation, admin-only write) ----------
+    match /coupons/{code} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
