@@ -605,7 +605,10 @@ function statusLabel(status) {
   return map[status] || status;
 }
 
+let myOrdersCache = [];
+
 function renderMyOrders(orders) {
+  myOrdersCache = orders || [];
   const wrap = document.getElementById("myOrdersList");
   if (!wrap) return;
   if (!orders || orders.length === 0) {
@@ -617,17 +620,33 @@ function renderMyOrders(orders) {
       const date = o.createdAt?.seconds
         ? new Date(o.createdAt.seconds * 1000).toLocaleDateString()
         : "";
+      const canCancel = o.status === "pending";
       return `
-        <div class="order-item">
+        <div class="order-item" data-order-id="${o.id}">
           <div class="order-item-head">
             <span class="order-id">#${o.id.slice(-6).toUpperCase()}</span>
             <span class="order-status status-${o.status}">${statusLabel(o.status)}</span>
           </div>
           <div class="order-item-meta">${date} · ${(o.items || []).length} item(s) · ${formatPrice(o.total)}</div>
+          <div class="order-item-actions">
+            <button class="btn btn-ghost btn-small" data-view-order="${o.id}">View details</button>
+            <button class="btn btn-ghost btn-small" data-reorder="${o.id}">Reorder</button>
+            ${canCancel ? `<button class="btn btn-ghost btn-small cancel-btn" data-cancel-order="${o.id}">Cancel</button>` : ""}
+          </div>
         </div>
       `;
     })
     .join("");
+
+  wrap.querySelectorAll("[data-view-order]").forEach((btn) =>
+    btn.addEventListener("click", () => openOrderDetails(btn.dataset.viewOrder))
+  );
+  wrap.querySelectorAll("[data-reorder]").forEach((btn) =>
+    btn.addEventListener("click", () => reorderFromOrder(btn.dataset.reorder))
+  );
+  wrap.querySelectorAll("[data-cancel-order]").forEach((btn) =>
+    btn.addEventListener("click", () => cancelMyOrder(btn.dataset.cancelOrder))
+  );
 }
 
 // ---------- Auth-driven data (cart merge, wishlist, orders) ----------
