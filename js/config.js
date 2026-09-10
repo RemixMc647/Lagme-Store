@@ -15,6 +15,7 @@
 // See FIRESTORE_SETUP.md.
 const ADMIN_EMAILS = [
   "adelabuaderemi02@gmail.com",
+  "abdulrazaqgodwinomeiza1@gmail.com",
 ];
 
 // Paystack PUBLIC key (starts with "pk_test_" or "pk_live_").
