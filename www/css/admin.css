@@ -1,3 +1,4 @@
+
 /* Admin dashboard — builds on top of style.css's variables and .btn/.auth-* classes */
 
 .admin-body { background: var(--bg); }
@@ -13,6 +14,7 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  flex-wrap: wrap;
 }
 .admin-header-inner .logo-text { color: #fff; font-size: 1.2rem; }
 .admin-header-inner .logo-text small { color: var(--gold-bright); font-weight: 500; font-size: 0.7rem; vertical-align: middle; }
@@ -107,4 +109,14 @@
 
 @media (max-width: 640px) {
   .admin-table th, .admin-table td { white-space: normal; }
+}
+
+@media (max-width: 480px) {
+  .admin-header-inner .logo-text { font-size: 1rem; }
+  .admin-main { padding: 1.2rem 1rem 3rem; }
+  .admin-stats { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.7rem; }
+  .admin-stat-card { padding: 0.8rem 0.9rem; }
+  .admin-stat-card .stat-value { font-size: 1.25rem; }
+  .admin-panel-head { gap: 0.5rem; }
+  .admin-table th, .admin-table td { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
 }
