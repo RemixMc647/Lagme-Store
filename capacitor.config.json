@@ -1,0 +1,8 @@
+{
+  "appId": "com.lordandgrace.store",
+  "appName": "Lord & Grace",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

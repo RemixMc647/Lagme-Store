@@ -1,0 +1,19 @@
+{
+  "name": "lord-and-grace-store",
+  "version": "1.0.0",
+  "description": "Lord & Grace storefront — packaged for Android/iOS with Capacitor",
+  "scripts": {
+    "sync": "cap sync",
+    "android": "cap open android",
+    "ios": "cap open ios",
+    "electron": "electron ."
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
