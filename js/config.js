@@ -14,10 +14,10 @@
 // admin writes even though the dashboard lets you try them.
 // See FIRESTORE_SETUP.md.
 const ADMIN_EMAILS = [
-  "owner@example.com",
+  "adelabuaderemi02@gmail.com",
 ];
 
 // Paystack PUBLIC key (starts with "pk_test_" or "pk_live_").
 // Get it from Paystack Dashboard → Settings → API Keys & Webhooks.
 // See PAYSTACK_SETUP.md for the full walkthrough.
-const PAYSTACK_PUBLIC_KEY = "PASTE_YOUR_PAYSTACK_PUBLIC_KEY_HERE";
+const PAYSTACK_PUBLIC_KEY = "pk_test_81076a7205a315c859955fc9931f816d895f8e87";
