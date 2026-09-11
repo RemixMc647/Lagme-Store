@@ -777,7 +777,7 @@ function buildOrderPayload(details, paymentMethod, extra) {
     total: cartTotal(),
     currency: "NGN",
     paymentMethod,
-    status: paymentMethod === "paystack" ? "paid" : "pending",
+    status: paymentMethod === "flutterwave" ? "paid" : "pending",
     ...extra,
   };
 }
@@ -817,33 +817,53 @@ function handlePayOnline() {
   const details = readCheckoutDetails();
   if (!details) return;
 
-  if (typeof PaystackPop === "undefined" || PAYSTACK_PUBLIC_KEY.startsWith("PASTE_")) {
+  if (typeof FlutterwaveCheckout === "undefined" || FLUTTERWAVE_PUBLIC_KEY.startsWith("PASTE_")) {
     document.getElementById("checkoutError").hidden = false;
     document.getElementById("checkoutError").textContent =
       "Online payment isn't set up yet — see PAYSTACK_SETUP.md, or use \"Order via WhatsApp\" below.";
     return;
   }
 
-  const handler = PaystackPop.setup({
-    key: PAYSTACK_PUBLIC_KEY,
-    email: currentUser.email || `${details.phone}@guest.lordandgrace`,
-    amount: Math.round(cartTotal() * 100), // kobo
+  const txRef = `LG-${Date.now()}`;
+
+  FlutterwaveCheckout({
+    public_key: FLUTTERWAVE_PUBLIC_KEY,
+    tx_ref: txRef,
+    amount: cartTotal(),
     currency: "NGN",
-    ref: `LG-${Date.now()}`,
-    metadata: { customerName: details.name, phone: details.phone },
-    callback: function (response) {
-      const orderPayload = buildOrderPayload(details, "paystack", {
-        paystackReference: response.reference,
-      });
-      finishOrder(orderPayload).then(() => {
-        alert("Payment received — thank you! Your order is confirmed.");
-      });
+    payment_options: "card, banktransfer, ussd",
+    customer: {
+      email: currentUser.email || `${details.phone}@guest.lordandgrace`,
+      phone_number: details.phone,
+      name: details.name,
     },
-    onClose: function () {
+    customizations: {
+      title: "Lord & Grace",
+      description: "Order payment",
+    },
+    callback: function (response) {
+      if (response.status === "successful" || response.status === "completed") {
+        fetch(`/verify-payment?transaction_id=${response.transaction_id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              const orderPayload = buildOrderPayload(details, "flutterwave", {
+                flutterwaveRef: txRef,
+                flutterwaveTransactionId: response.transaction_id,
+              });
+              finishOrder(orderPayload).then(() => {
+                alert("Payment received — thank you! Your order is confirmed.");
+              });
+            } else {
+              alert("We couldn't verify this payment. Please contact support before retrying.");
+            }
+          });
+      }
+    },
+    onclose: function () {
       /* user closed the payment popup — nothing to do */
     },
   });
-  handler.openIframe();
 }
 
 // ---------- My Orders ----------
