@@ -277,11 +277,15 @@ function renderProducts() {
 
   empty.hidden = list.length !== 0;
   grid.innerHTML = list.map(productCardHTML).join("");
+  bindProductCardEvents(grid);
+  renderRecentlyViewed();
+}
 
-  grid.querySelectorAll("[data-open-id]").forEach((el) => {
+function bindProductCardEvents(container) {
+  container.querySelectorAll("[data-open-id]").forEach((el) => {
     el.addEventListener("click", () => openQuickView(el.dataset.openId));
   });
-  grid.querySelectorAll("[data-add-id]").forEach((btn) => {
+  container.querySelectorAll("[data-add-id]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       addToCart(btn.dataset.addId);
@@ -293,7 +297,7 @@ function renderProducts() {
       }, 900);
     });
   });
-  grid.querySelectorAll("[data-wish-id]").forEach((btn) => {
+  container.querySelectorAll("[data-wish-id]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       toggleWishlist(btn.dataset.wishId);
@@ -343,11 +347,42 @@ function productCardHTML(p) {
   `;
 }
 
+// ---------- Recently viewed ----------
+function getRecentlyViewed() {
+  try {
+    return JSON.parse(localStorage.getItem("lg_recently_viewed")) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function addToRecentlyViewed(id) {
+  let list = getRecentlyViewed().filter((x) => x !== id);
+  list.unshift(id);
+  list = list.slice(0, 10);
+  localStorage.setItem("lg_recently_viewed", JSON.stringify(list));
+}
+
+function renderRecentlyViewed() {
+  const section = document.getElementById("recentlyViewedSection");
+  const grid = document.getElementById("recentlyViewedGrid");
+  if (!section || !grid) return;
+  const ids = getRecentlyViewed().filter((id) => getProduct(id));
+  if (ids.length === 0) {
+    section.hidden = true;
+    return;
+  }
+  section.hidden = false;
+  grid.innerHTML = ids.map((id) => productCardHTML(getProduct(id))).join("");
+  bindProductCardEvents(grid);
+}
+
 // ---------- Quick view modal ----------
 function openQuickView(id) {
   const p = getProduct(id);
   if (!p) return;
   openQuickViewId = id;
+  addToRecentlyViewed(id);
   const content = document.getElementById("quickViewContent");
   const oldPriceHTML = p.oldPrice
     ? `<span class="old-price">${formatPrice(p.oldPrice)}</span>`
@@ -359,8 +394,22 @@ function openQuickView(id) {
     ? `<div class="flash-countdown" data-countdown-end="${p.saleEndsAt}">⚡ ${formatCountdown(p.saleEndsAt - Date.now())} left</div>`
     : "";
 
+  // Supports a future `images` array field; falls back to the single
+  // `image` field so existing products keep working with no admin changes.
+  const gallery = Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.image];
+  const thumbsHTML =
+    gallery.length > 1
+      ? `<div class="qv-thumbs">${gallery
+          .map(
+            (src, i) =>
+              `<img src="${src}" class="qv-thumb${i === 0 ? " active" : ""}" data-thumb-src="${src}" alt="${p.name} view ${i + 1}" />`
+          )
+          .join("")}</div>`
+      : "";
+
   content.innerHTML = `
-    <div class="qv-image"><img src="${p.image}" alt="${p.name}" /></div>
+    <div class="qv-image"><img src="${gallery[0]}" alt="${p.name}" id="qvMainImage" /></div>
+    ${thumbsHTML}
     <div class="qv-body">
       <span class="product-cat">${p.category}</span>
       <h3>${p.name}</h3>
@@ -376,6 +425,7 @@ function openQuickView(id) {
         <button class="btn btn-ghost wish-toggle${wished ? " active" : ""}" id="qvWishBtn">${wished ? "♥ Wishlisted" : "♡ Add to wishlist"}</button>
       </div>
       <div class="qv-reviews" id="qvReviews"></div>
+      <div class="qv-related" id="qvRelated"></div>
     </div>
   `;
 
@@ -388,8 +438,32 @@ function openQuickView(id) {
   }
   document.getElementById("qvWishBtn").addEventListener("click", () => toggleWishlist(p.id));
 
+  content.querySelectorAll("[data-thumb-src]").forEach((thumb) => {
+    thumb.addEventListener("click", () => {
+      document.getElementById("qvMainImage").src = thumb.dataset.thumbSrc;
+      content.querySelectorAll(".qv-thumb").forEach((t) => t.classList.remove("active"));
+      thumb.classList.add("active");
+    });
+  });
+
   renderReviewsSection(id);
+  renderRelatedProducts(p);
   document.getElementById("modalOverlay").classList.add("open");
+}
+
+function renderRelatedProducts(p) {
+  const wrap = document.getElementById("qvRelated");
+  if (!wrap) return;
+  const related = PRODUCTS.filter((x) => x.category === p.category && x.id !== p.id).slice(0, 4);
+  if (related.length === 0) {
+    wrap.innerHTML = "";
+    return;
+  }
+  wrap.innerHTML = `
+    <h4 class="qv-related-title">You may also like</h4>
+    <div class="qv-related-grid">${related.map(productCardHTML).join("")}</div>
+  `;
+  bindProductCardEvents(wrap);
 }
 
 function renderReviewsSection(productId) {
