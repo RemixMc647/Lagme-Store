@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — Lord &amp; Grace</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="assets/lord-and-grace-logo.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body class="admin-body">
+
+<header class="admin-header">
+  <div class="admin-header-inner">
+    <span class="logo-badge"><img src="assets/lord-and-grace-logo.jpg" alt="Lord & Grace logo" /></span>
+    <span class="logo-text">Lord<span class="logo-accent">&amp;</span>Grace <small>Admin</small></span>
+    <div class="admin-header-actions">
+      <a href="index.html" class="btn btn-ghost-dark btn-small">← Back to store</a>
+      <button class="btn btn-ghost-dark btn-small" id="adminSignOutBtn" hidden>Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ SIGN-IN GATE ============ -->
+<section class="admin-gate" id="adminGate">
+  <div class="admin-gate-card">
+    <h2>Admin sign in</h2>
+    <p class="auth-error" id="adminAuthError" hidden></p>
+    <form class="auth-form" id="adminSignInForm">
+      <label>Email
+        <input type="email" id="adminEmail" required autocomplete="email" />
+      </label>
+      <label>Password
+        <input type="password" id="adminPassword" required autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+    </form>
+    <p class="admin-gate-note">Only emails listed in <code>js/config.js</code> (<code>ADMIN_EMAILS</code>) — and matching <code>firestore.rules</code> — can manage products and orders.</p>
+  </div>
+</section>
+
+<!-- ============ NOT AUTHORIZED ============ -->
+<section class="admin-gate" id="adminNotAuthorized" hidden>
+  <div class="admin-gate-card">
+    <h2>Not authorized</h2>
+    <p>You're signed in, but this account isn't on the admin list.</p>
+    <p class="admin-gate-note">Signed in as: <code id="notAuthEmail"></code></p>
+    <button class="btn btn-ghost btn-block" id="notAuthSignOutBtn">Sign out and try another account</button>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<main class="admin-main" id="adminDashboard" hidden>
+
+  <div class="admin-stats" id="adminStats">
+    <!-- filled by JS -->
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="products">Products</button>
+    <button class="admin-tab" data-tab="orders">Orders</button>
+    <button class="admin-tab" data-tab="coupons">Coupons</button>
+  </div>
+
+  <!-- ---------- Products tab ---------- -->
+  <section class="admin-panel" id="panelProducts">
+    <div class="admin-panel-head">
+      <h2>Products</h2>
+      <div class="admin-panel-actions">
+        <button class="btn btn-ghost btn-small" id="seedProductsBtn" hidden>Import starter catalog</button>
+        <button class="btn btn-primary btn-small" id="newProductBtn">+ Add product</button>
+      </div>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="productsTable">
+        <thead>
+          <tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Badge</th><th></th></tr>
+        </thead>
+        <tbody id="productsTableBody"><!-- filled by JS --></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------- Orders tab ---------- -->
+  <section class="admin-panel" id="panelOrders" hidden>
+    <div class="admin-panel-head">
+      <h2>Orders</h2>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="ordersTable">
+        <thead>
+          <tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Date</th><th>Status</th></tr>
+        </thead>
+        <tbody id="ordersTableBody"><!-- filled by JS --></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------- Coupons tab ---------- -->
+  <section class="admin-panel" id="panelCoupons" hidden>
+    <div class="admin-panel-head">
+      <h2>Coupons</h2>
+      <div class="admin-panel-actions">
+        <button class="btn btn-primary btn-small" id="newCouponBtn">+ Add coupon</button>
+      </div>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="couponsTable">
+        <thead>
+          <tr><th>Code</th><th>Discount</th><th>Min spend</th><th>Expires</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody id="couponsTableBody"><!-- filled by JS --></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- ============ COUPON MODAL ============ -->
+<div class="modal-overlay" id="couponModalOverlay">
+  <div class="auth-card" id="couponModalCard" role="dialog" aria-modal="true">
+    <button class="icon-btn close-modal" id="closeCouponModal" aria-label="Close">&times;</button>
+    <h3 class="auth-welcome">Add coupon</h3>
+    <p class="auth-error" id="couponFormError" hidden></p>
+    <form class="auth-form" id="couponForm">
+      <label>Code
+        <input type="text" id="cfCode" required autocapitalize="characters" placeholder="e.g. WELCOME10" />
+      </label>
+      <label>Discount type
+        <select id="cfType">
+          <option value="percent">Percentage off</option>
+          <option value="fixed">Fixed amount off (₦)</option>
+        </select>
+      </label>
+      <label>Discount value
+        <input type="number" id="cfValue" min="1" required />
+      </label>
+      <label>Minimum spend (₦, optional)
+        <input type="number" id="cfMinSpend" min="0" />
+      </label>
+      <label>Expires on (optional)
+        <input type="date" id="cfExpires" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" id="cfSubmitBtn">Save coupon</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ PRODUCT EDIT MODAL ============ -->
+<div class="modal-overlay" id="productModalOverlay">
+  <div class="auth-card" id="productModalCard" role="dialog" aria-modal="true">
+    <button class="icon-btn close-modal" id="closeProductModal" aria-label="Close">&times;</button>
+    <h3 class="auth-welcome" id="productModalTitle">Add product</h3>
+    <p class="auth-error" id="productFormError" hidden></p>
+    <form class="auth-form" id="productForm">
+      <input type="hidden" id="pfId" />
+      <label>Name
+        <input type="text" id="pfName" required />
+      </label>
+      <label>Category
+        <select id="pfCategory" required></select>
+      </label>
+      <label>Price (₦)
+        <input type="number" id="pfPrice" min="0" required />
+      </label>
+      <label>Old price (₦, optional — for a strikethrough sale price)
+        <input type="number" id="pfOldPrice" min="0" />
+      </label>
+      <label>Stock quantity
+        <input type="number" id="pfStock" min="0" value="20" required />
+      </label>
+      <label>Image URL
+        <input type="text" id="pfImage" required />
+      </label>
+      <label>Badge (optional)
+        <select id="pfBadge">
+          <option value="">None</option>
+          <option value="New">New</option>
+          <option value="Sale">Sale</option>
+          <option value="Best Seller">Best Seller</option>
+        </select>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="pfFlashSale" />
+        Flash sale (shows a countdown timer on the storefront)
+      </label>
+      <label id="pfSaleEndsWrap" hidden>Flash sale ends
+        <input type="datetime-local" id="pfSaleEnds" />
+      </label>
+      <label>Description
+        <textarea id="pfDescription" rows="2" required></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" id="pfSubmitBtn">Save product</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/products.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
