@@ -1,23 +1,33 @@
 const auth = firebase.auth();
 
+// Hide everything immediately — nothing shows until Firebase tells us
+// whether we're signed in and authorized. Prevents a flash of the wrong screen.
+document.getElementById("adminGate").hidden = true;
+document.getElementById("adminNotAuthorized").hidden = true;
+document.getElementById("adminDashboard").hidden = true;
+document.getElementById("adminSignOutBtn").hidden = true;
+
 let allProducts = [];
 let allOrders = [];
 let allCoupons = [];
 
 // ---------- Gate ----------
 function showGate() {
+  document.getElementById("adminLoading")?.remove();
   document.getElementById("adminGate").hidden = false;
   document.getElementById("adminNotAuthorized").hidden = true;
   document.getElementById("adminDashboard").hidden = true;
   document.getElementById("adminSignOutBtn").hidden = true;
 }
 function showNotAuthorized() {
+  document.getElementById("adminLoading")?.remove();
   document.getElementById("adminGate").hidden = true;
   document.getElementById("adminNotAuthorized").hidden = false;
   document.getElementById("adminDashboard").hidden = true;
   document.getElementById("adminSignOutBtn").hidden = false;
 }
 function showDashboard() {
+  document.getElementById("adminLoading")?.remove();
   document.getElementById("adminGate").hidden = true;
   document.getElementById("adminNotAuthorized").hidden = true;
   document.getElementById("adminDashboard").hidden = false;
