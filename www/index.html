@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
- <script src="https://checkout.flutterwave.com/v3.js"></script> 
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lord &amp; Grace — Multipurpose Enterprises</title>
@@ -129,6 +129,14 @@
   <p class="empty-state" id="emptyState" hidden>Nothing here yet. Try a different category.</p>
 </main>
 
+<!-- ============ RECENTLY VIEWED ============ -->
+<section class="recently-viewed-section" id="recentlyViewedSection" hidden>
+  <h2>Recently Viewed</h2>
+  <div class="product-grid" id="recentlyViewedGrid">
+    <!-- filled by JS -->
+  </div>
+</section>
+
 <!-- ============ ABOUT ============ -->
 <section class="about" id="about">
   <h2>Why Lord &amp; Grace</h2>
@@ -165,7 +173,7 @@
       <p>Shop 116 Dick road, Aleshinloye way, Ibadan</p>
     </div>
   </div>
-  <p class="footer-copy">&copy; <span id="year"></span> Lord &amp; Grace Multipurpose Enterprises. All rights reserved.</p>
+  <p class="footer-copy">&copy; <span id="year"></span> Lord &amp; Grace Multipurpose Enterprises. All rights reserved. · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a></p>
 </footer>
 
 <!-- ============ CART DRAWER ============ -->
