@@ -898,5 +898,12 @@ button {
   .flash-sale-inner { padding: 1.1rem 1rem 1.3rem; }
   .flash-sale-head h2 { font-size: 1.05rem; }
   .flash-sale-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
-
+.recently-viewed-section { padding: 2rem 1.5rem; }
+.recently-viewed-section h2 { margin-bottom: 1rem; }
+.qv-thumbs { display: flex; gap: 0.5rem; margin-top: 0.5rem; overflow-x: auto; }
+.qv-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; cursor: pointer; opacity: 0.6; border: 2px solid transparent; }
+.qv-thumb.active { opacity: 1; border-color: var(--gold-bright); }
+.qv-related { margin-top: 1.5rem; }
+.qv-related-title { font-size: 1rem; margin-bottom: 0.6rem; }
+.qv-related-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
   
