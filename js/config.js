@@ -18,7 +18,6 @@ const ADMIN_EMAILS = [
   "abdulrazaqqgodwinomeiza1@gmail.com",
 ];
 
-// Paystack PUBLIC key (starts with "pk_test_" or "pk_live_").
-// Get it from Paystack Dashboard → Settings → API Keys & Webhooks.
-// See PAYSTACK_SETUP.md for the full walkthrough.
-const PAYSTACK_PUBLIC_KEY = "pk_test_81076a7205a315c859955fc9931f816d895f8e87";
+// Flutterwave PUBLIC key (starts with "FLWPUBK_TEST-" or "FLWPUBK-").
+// Get it from Flutterwave Dashboard → Settings → API Keys.
+const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-bd1567b16066dd22c4532c6999912be9-X";
