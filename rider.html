@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rider — Lord &amp; Grace</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="assets/lord-and-grace-logo.jpg" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/admin.css" />
+<style>
+  .rider-body { max-width: 480px; margin: 0 auto; padding: 1.5rem; }
+  .rider-order-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+  .rider-status-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+  .rider-status-dot.live { background:#2ecc71; }
+  .rider-status-dot.off { background:#ccc; }
+</style>
+</head>
+<body class="admin-body">
+<p id="riderLoading" style="text-align:center;padding:40px;">Loading...</p>
+
+<header class="admin-header">
+  <div class="admin-header-inner">
+    <span class="logo-text">Lord<span class="logo-accent">&amp;</span>Grace <small>Rider</small></span>
+    <div class="admin-header-actions">
+      <a href="admin.html" class="btn btn-ghost-dark btn-small">← Admin</a>
+      <button class="btn btn-ghost-dark btn-small" id="riderSignOutBtn" hidden>Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<section class="admin-gate" id="riderGate" hidden>
+  <div class="admin-gate-card">
+    <h2>Rider sign in</h2>
+    <p class="auth-error" id="riderAuthError" hidden></p>
+    <form class="auth-form" id="riderSignInForm">
+      <label>Email
+        <input type="email" id="riderEmail" required autocomplete="email" />
+      </label>
+      <label>Password
+        <input type="password" id="riderPassword" required autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+    </form>
+    <p class="admin-gate-note">Only accounts listed in <code>ADMIN_EMAILS</code> can share delivery location.</p>
+  </div>
+</section>
+
+<section class="admin-gate" id="riderNotAuthorized" hidden>
+  <div class="admin-gate-card">
+    <h2>Not authorized</h2>
+    <p>You're signed in, but this account isn't on the admin list.</p>
+    <button class="btn btn-ghost btn-block" id="riderNotAuthSignOutBtn">Sign out and try another account</button>
+  </div>
+</section>
+
+<main class="rider-body" id="riderDashboard" hidden>
+  <h2>Active deliveries</h2>
+  <p style="font-size:0.85rem;color:var(--text-soft);">Pick an order below and start sharing your location while you're out for delivery. Keep this page open on your phone — closing it stops the location updates.</p>
+  <div id="riderOrdersList"></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/rider.js"></script>
+</body>
+</html>
