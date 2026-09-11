@@ -34,6 +34,9 @@ const CATEGORIES = [
   "Clothing",
   "Perfume",
   "Phone Accessories",
+  "Jewelry",
+  "Home & Kitchen",
+  "Gadgets",
 ];
 
 // Icon shown per category on the homepage category grid (Temu/Jumia-style).
@@ -46,6 +49,9 @@ const CATEGORY_ICONS = {
   Clothing: "👗",
   Perfume: "🌸",
   "Phone Accessories": "🎧",
+  Jewelry: "💍",
+  "Home & Kitchen": "🍽️",
+  Gadgets: "🔌",
 };
 
 // Homepage banner carousel slides. Edit freely — add/remove slides,
@@ -223,5 +229,55 @@ const SEED_PRODUCTS = [
     description: "Bluetooth earbuds with a full-day charging case battery life.",
     flashSale: true,
     saleEndsAt: Date.now() + 3 * 60 * 60 * 1000, // demo: 3 hours from page load
+  },
+  {
+    id: 15,
+    name: "2-in-1 Hair Straightener Comb",
+    category: "Cosmetics",
+    price: 8500,
+    oldPrice: null,
+    image: "images/hair-straightener-comb.jpg",
+    badge: "New",
+    description: "Ceramic straightening comb brush — smooths and styles in one pass. Available in red, black/pink, teal and white.",
+  },
+  {
+    id: 16,
+    name: "Bamboo-Print Round Plates (Set of 3) — B1007",
+    category: "Home & Kitchen",
+    price: 700,
+    oldPrice: null,
+    image: "images/bamboo-plates-b1007.jpg",
+    badge: null,
+    description: "Durable round plates with a bamboo-look finish. Price shown is per plate.",
+  },
+  {
+    id: 17,
+    name: "Manual Fruit & Vegetable Juicer",
+    category: "Home & Kitchen",
+    price: 12000,
+    oldPrice: null,
+    image: "images/fruit-veg-juicer.jpg",
+    badge: "New",
+    description: "Hand-crank juicer for fresh fruit and vegetable juice — no electricity needed.",
+  },
+  {
+    id: 18,
+    name: "Rechargeable Neck Fan (SX-5011)",
+    category: "Gadgets",
+    price: 8300,
+    oldPrice: null,
+    image: "images/neck-fan-sx5011.jpg",
+    badge: "New",
+    description: "Portable hands-free neck fan, 2000mAh battery, 3 speeds, bladeless design.",
+  },
+  {
+    id: 19,
+    name: "Heating Menstrual Belt",
+    category: "Gadgets",
+    price: 15000,
+    oldPrice: null,
+    image: "images/menstrual-heating-belt.jpg",
+    badge: "New",
+    description: "Adjustable heat therapy belt for period cramp relief, with digital display and adjustable strap. Comes gift-boxed.",
   },
 ];
