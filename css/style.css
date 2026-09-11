@@ -1,3 +1,4 @@
+
 :root {
   --black: #0B0B0C;
   --charcoal: #1B1A17;
@@ -79,6 +80,14 @@ button {
 }
 .btn-ghost:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
 .btn-block { width: 100%; text-align: center; }
+
+/* Ghost buttons placed on light backgrounds (e.g. inside .auth-card)
+   need dark text/border instead of the white default above. */
+.auth-card .btn-ghost {
+  border: 1.5px solid rgba(0,0,0,0.25);
+  color: #1A1811;
+}
+.auth-card .btn-ghost:hover { border-color: var(--gold-bright); color: var(--gold); }
 
 /* ---------- Promo strip ---------- */
 .promo-strip {
