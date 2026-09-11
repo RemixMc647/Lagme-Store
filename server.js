@@ -8,14 +8,15 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'www')));
 
 app.get('/verify-payment', async (req, res) => {
-  const reference = req.query.reference;
-  const response = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+  const transactionId = req.query.transaction_id;
+  const response = await fetch(`https://api.flutterwave.com/v3/transactions/${transactionId}/verify`, {
     headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
+      Authorization: `Bearer ${process.env.FLUTTERWAVE_SECRET_KEY}`
     }
   });
   const data = await response.json();
-  res.json(data.data);
+  const verified = data.status === 'success' && data.data.status === 'successful';
+  res.json({ status: verified ? 'success' : 'failed', data: data.data });
 });
 
 app.get('/*splat', (req, res) => {
