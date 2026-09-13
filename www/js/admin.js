@@ -2,7 +2,7 @@ const auth = firebase.auth();
 
 // ---------- Cloudinary config ----------
 const CLOUDINARY_CLOUD_NAME = "sdb8nq1v";
-const CLOUDINARY_UPLOAD_PRESET = "Lagme-Store";
+const CLOUDINARY_UPLOAD_PRESET = "lagme_store";
 
 let allProducts = [];
 let allOrders = [];
