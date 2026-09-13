@@ -328,9 +328,25 @@
       <label>Phone number
         <input type="tel" id="checkoutPhone" required />
       </label>
-      <label>Delivery address
-        <textarea id="checkoutAddress" rows="2" required></textarea>
+      <label>State
+        <select id="checkoutState" required></select>
       </label>
+      <label>City / Area
+        <input type="text" id="checkoutCity" required placeholder="e.g. Bodija, Ibadan" />
+      </label>
+      <label>Street address (house no., street name)
+        <input type="text" id="checkoutStreet" required placeholder="e.g. 12 Awolowo Avenue" />
+      </label>
+      <label>Landmark / additional directions (optional)
+        <input type="text" id="checkoutLandmark" placeholder="e.g. opposite GTBank, blue gate" />
+      </label>
+      <label>Pin your exact delivery location
+        <input type="text" id="checkoutMapSearch" placeholder="Search for your area on the map..." />
+      </label>
+      <div id="checkoutMap" style="height:220px;border-radius:10px;margin-top:6px;"></div>
+      <p class="auth-note" id="checkoutMapHint">Drag the pin to your exact delivery spot — this helps our rider find you faster.</p>
+      <input type="hidden" id="checkoutLat" />
+      <input type="hidden" id="checkoutLng" />
     </form>
     <div class="checkout-total-row coupon-discount-row" id="checkoutDiscountRow" hidden>
       <span>Discount<span id="checkoutCouponCode"></span></span>
