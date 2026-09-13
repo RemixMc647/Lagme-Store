@@ -73,6 +73,15 @@ function formatCountdown(ms) {
 }
 
 function filteredProducts() {
+  if (window.PRESET_VIEW === "deals") {
+    let list = flashSaleProducts();
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter((p) => p.name.toLowerCase().includes(q));
+    }
+    return list;
+  }
+
   let list = activeCategory === "All" ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeCategory);
 
   if (searchQuery.trim()) {
@@ -186,10 +195,7 @@ function renderCategoryGrid() {
 
   wrap.querySelectorAll("[data-cat]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      activeCategory = btn.dataset.cat;
-      renderCategoryPills();
-      renderProducts();
-      document.getElementById("catalog").scrollIntoView({ behavior: "smooth" });
+      window.location.href = `category.html?cat=${encodeURIComponent(btn.dataset.cat)}`;
     });
   });
 }
@@ -1265,6 +1271,12 @@ window.doCheckout = openCheckoutDetails;
 
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
+  if (window.PRESET_CATEGORY) activeCategory = window.PRESET_CATEGORY;
+  if (window.PRESET_SEARCH) {
+    searchQuery = window.PRESET_SEARCH;
+    const searchBox = document.getElementById("searchInput");
+    if (searchBox) searchBox.value = window.PRESET_SEARCH;
+  }
   renderCategoryPills();
   renderCategoryGrid();
   renderHeroCarousel();
@@ -1272,5 +1284,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   initControls();
   initDataFeeds();
+  if (window.PRESET_PRODUCT_ID) {
+    openQuickViewId = window.PRESET_PRODUCT_ID;
+  }
   setInterval(tickFlashSaleCountdowns, 1000);
 });
