@@ -4,6 +4,7 @@ const storage = firebase.storage();
 let allProducts = [];
 let allOrders = [];
 let allCoupons = [];
+let adminProductSearchQuery = "";
 
 // ---------- Gate ----------
 function showGate() {
@@ -109,7 +110,21 @@ function renderStats() {
 // ---------- Products table ----------
 function renderProductsTable() {
   const body = document.getElementById("productsTableBody");
-  body.innerHTML = allProducts
+  const q = adminProductSearchQuery.trim().toLowerCase();
+  const list = q
+    ? allProducts.filter(
+        (p) =>
+          (p.name || "").toLowerCase().includes(q) ||
+          (p.category || "").toLowerCase().includes(q)
+      )
+    : allProducts;
+
+  if (list.length === 0) {
+    body.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--text-soft);">No products match "${document.getElementById("adminProductSearch").value}".</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = list
     .map((p) => {
       const stockHTML =
         typeof p.stock === "number"
@@ -138,11 +153,18 @@ function renderProductsTable() {
   body.querySelectorAll("[data-delete]").forEach((btn) =>
     btn.addEventListener("click", () => {
       if (confirm("Delete this product? This can't be undone.")) {
-        LG.deleteProduct(btn.dataset.delete);
+        LG.deleteProduct(btn.dataset.delete).catch((err) => {
+          alert("Couldn't delete product: " + (err.message || "unknown error"));
+        });
       }
     })
   );
 }
+
+document.getElementById("adminProductSearch").addEventListener("input", (e) => {
+  adminProductSearchQuery = e.target.value;
+  renderProductsTable();
+});
 
 document.getElementById("seedProductsBtn").addEventListener("click", () => {
   if (confirm("Import the starter catalog (SEED_PRODUCTS) into Firestore?")) {
