@@ -1,5 +1,8 @@
 const auth = firebase.auth();
-const storage = firebase.storage();
+
+// ---------- Cloudinary config ----------
+const CLOUDINARY_CLOUD_NAME = "sdb8nq1v";
+const CLOUDINARY_UPLOAD_PRESET = "Lagme-Store";
 
 let allProducts = [];
 let allOrders = [];
@@ -275,11 +278,19 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
       btn.textContent = "Uploading image...";
       statusEl.hidden = false;
       statusEl.textContent = "Uploading image...";
-      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-      const path = `products/${Date.now()}-${safeName}`;
-      const ref = storage.ref().child(path);
-      const snapshot = await ref.put(file);
-      imageUrl = await snapshot.ref.getDownloadURL();
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        { method: "POST", body: formData }
+      );
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error?.message || "Upload failed");
+      imageUrl = result.secure_url;
+
       statusEl.hidden = true;
     } catch (err) {
       btn.disabled = false;
