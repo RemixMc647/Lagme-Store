@@ -19,6 +19,19 @@ let bannerTimer = null;
 let unsubWishlist = null;
 let unsubMyOrders = null;
 
+// ---------- Checkout map (delivery location picker) ----------
+const NIGERIA_STATES = [
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
+  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT (Abuja)", "Gombe",
+  "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos",
+  "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto",
+  "Taraba", "Yobe", "Zamfara",
+];
+const DEFAULT_MAP_CENTER = [7.3775, 3.9470]; // Ibadan — store location fallback
+let checkoutMap = null;
+let checkoutMarker = null;
+let checkoutMapSearchTimer = null;
+
 // ---------- Helpers ----------
 function formatPrice(n) {
   return CURRENCY_SYMBOL + Number(n || 0).toLocaleString();
@@ -797,11 +810,115 @@ function checkout() {
   openCheckoutDetails();
 }
 
+function populateCheckoutStateSelect() {
+  const sel = document.getElementById("checkoutState");
+  if (sel.options.length > 0) return; // already populated
+  sel.innerHTML =
+    `<option value="" disabled selected>Select state</option>` +
+    NIGERIA_STATES.map((s) => `<option value="${s}">${s}</option>`).join("");
+}
+
+function setCheckoutPin(lat, lng) {
+  document.getElementById("checkoutLat").value = lat;
+  document.getElementById("checkoutLng").value = lng;
+  if (checkoutMarker) checkoutMarker.setLatLng([lat, lng]);
+}
+
+function initCheckoutMap() {
+  if (checkoutMap) return; // already set up
+
+  const savedLat = parseFloat(localStorage.getItem("lg_lat"));
+  const savedLng = parseFloat(localStorage.getItem("lg_lng"));
+  const start =
+    !isNaN(savedLat) && !isNaN(savedLng) ? [savedLat, savedLng] : DEFAULT_MAP_CENTER;
+
+  checkoutMap = L.map("checkoutMap").setView(start, 15);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+    maxZoom: 19,
+  }).addTo(checkoutMap);
+
+  initCheckoutMapSearch();
+
+  checkoutMarker = L.marker(start, { draggable: true }).addTo(checkoutMap);
+  setCheckoutPin(start[0], start[1]);
+
+  checkoutMarker.on("dragend", () => {
+    const pos = checkoutMarker.getLatLng();
+    setCheckoutPin(pos.lat, pos.lng);
+  });
+
+  checkoutMap.on("click", (e) => {
+    checkoutMarker.setLatLng(e.latlng);
+    setCheckoutPin(e.latlng.lat, e.latlng.lng);
+  });
+
+  // Try to center on the customer's actual location the first time, if they allow it.
+  if (isNaN(savedLat) && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        checkoutMap.setView([latitude, longitude], 16);
+        checkoutMarker.setLatLng([latitude, longitude]);
+        setCheckoutPin(latitude, longitude);
+      },
+      () => {
+        /* permission denied or unavailable — keep the default pin */
+      },
+      { timeout: 5000 }
+    );
+  }
+}
+
+// Free OpenStreetMap search (Nominatim) — same idea as Jumia's address search,
+// no API key needed. Debounced so we don't hammer the API on every keystroke.
+function initCheckoutMapSearch() {
+  const input = document.getElementById("checkoutMapSearch");
+  input.addEventListener("input", () => {
+    clearTimeout(checkoutMapSearchTimer);
+    const query = input.value.trim();
+    if (query.length < 3) return;
+    checkoutMapSearchTimer = setTimeout(() => geocodeCheckoutSearch(query), 600);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      clearTimeout(checkoutMapSearchTimer);
+      geocodeCheckoutSearch(input.value.trim());
+    }
+  });
+}
+
+async function geocodeCheckoutSearch(query) {
+  if (!query) return;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ng&q=${encodeURIComponent(query)}`;
+    const res = await fetch(url);
+    const results = await res.json();
+    if (!results || results.length === 0) return;
+    const { lat, lon } = results[0];
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
+    checkoutMap.setView([latNum, lonNum], 16);
+    checkoutMarker.setLatLng([latNum, lonNum]);
+    setCheckoutPin(latNum, lonNum);
+  } catch (e) {
+    /* search is a convenience — silently ignore failures, customer can still drag the pin */
+  }
+}
+
+
 function openCheckoutDetails() {
   document.getElementById("checkoutName").value =
     (currentUser && currentUser.displayName) || "";
   document.getElementById("checkoutPhone").value = localStorage.getItem("lg_phone") || "";
-  document.getElementById("checkoutAddress").value = localStorage.getItem("lg_address") || "";
+
+  populateCheckoutStateSelect();
+  document.getElementById("checkoutState").value = localStorage.getItem("lg_state") || "";
+  document.getElementById("checkoutCity").value = localStorage.getItem("lg_city") || "";
+  document.getElementById("checkoutStreet").value = localStorage.getItem("lg_street") || "";
+  document.getElementById("checkoutLandmark").value = localStorage.getItem("lg_landmark") || "";
+
   document.getElementById("checkoutSummaryTotal").textContent = formatPrice(cartTotal());
 
   const discount = couponDiscount();
@@ -814,6 +931,13 @@ function openCheckoutDetails() {
 
   closeCart();
   document.getElementById("checkoutModalOverlay").classList.add("open");
+
+  // Leaflet needs the container visible with real dimensions to size itself
+  // correctly, so we init/resize it right after the modal becomes visible.
+  setTimeout(() => {
+    initCheckoutMap();
+    checkoutMap.invalidateSize();
+  }, 50);
 }
 
 function closeCheckoutDetails() {
@@ -823,15 +947,43 @@ function closeCheckoutDetails() {
 function readCheckoutDetails() {
   const name = document.getElementById("checkoutName").value.trim();
   const phone = document.getElementById("checkoutPhone").value.trim();
-  const address = document.getElementById("checkoutAddress").value.trim();
-  if (!name || !phone || !address) {
+  const state = document.getElementById("checkoutState").value.trim();
+  const city = document.getElementById("checkoutCity").value.trim();
+  const street = document.getElementById("checkoutStreet").value.trim();
+  const landmark = document.getElementById("checkoutLandmark").value.trim();
+  const lat = parseFloat(document.getElementById("checkoutLat").value);
+  const lng = parseFloat(document.getElementById("checkoutLng").value);
+
+  if (!name || !phone || !state || !city || !street) {
     document.getElementById("checkoutError").hidden = false;
     return null;
   }
   document.getElementById("checkoutError").hidden = true;
+
+  const address = [street, landmark ? `(near ${landmark})` : "", city, state, "Nigeria"]
+    .filter(Boolean)
+    .join(", ");
+
   localStorage.setItem("lg_phone", phone);
-  localStorage.setItem("lg_address", address);
-  return { name, phone, address };
+  localStorage.setItem("lg_state", state);
+  localStorage.setItem("lg_city", city);
+  localStorage.setItem("lg_street", street);
+  localStorage.setItem("lg_landmark", landmark);
+  if (!isNaN(lat) && !isNaN(lng)) {
+    localStorage.setItem("lg_lat", lat);
+    localStorage.setItem("lg_lng", lng);
+  }
+
+  return {
+    name,
+    phone,
+    address,
+    state,
+    city,
+    street,
+    landmark,
+    location: !isNaN(lat) && !isNaN(lng) ? { lat, lng } : null,
+  };
 }
 
 function buildOrderPayload(details, paymentMethod, extra) {
@@ -841,6 +993,11 @@ function buildOrderPayload(details, paymentMethod, extra) {
     customerName: details.name,
     phone: details.phone,
     address: details.address,
+    state: details.state || null,
+    city: details.city || null,
+    street: details.street || null,
+    landmark: details.landmark || null,
+    location: details.location || null,
     items: cart.map((item) => {
       const p = getProduct(item.id);
       return { id: item.id, name: p.name, price: p.price, qty: item.qty };
@@ -880,7 +1037,10 @@ function handleWhatsAppCheckout() {
   const message =
     `Hi! This is ${details.name} (${details.phone}). I'd like to order:\n\n` +
     lines.join("\n") +
-    `\n\nTotal: ${formatPrice(cartTotal())}\nDelivery address: ${details.address}`;
+    `\n\nTotal: ${formatPrice(cartTotal())}\nDelivery address: ${details.address}` +
+    (details.location
+      ? `\nMap location: https://maps.google.com/?q=${details.location.lat},${details.location.lng}`
+      : "");
 
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
