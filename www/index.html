@@ -1,18 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="google-site-verification" content="S8Ce-CzKNxv-ZgZ-ogLzlfEILj_KvLr6QdWeHq7XKfc" />
   <meta name="google-adsense-account" content="ca-pub-1176167350648115">
+  <meta name="google-adsense-account" content="ca-pub-1176167350648115">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1176167350648115"
+     crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://checkout.flutterwave.com/v3.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lord &amp; Grace — Multipurpose Enterprises</title>
-<meta name="description" content="Cosmetics, toiletries, footwear, makeup, clothing, perfume and phone accessories — all you need, all in one place." />
-<link rel="icon" href="assets/lord-and-grace-logo.jpg" />
+<meta name="description" content="Lagme Store (Lord & Grace) — Cosmetics, toiletries, footwear, makeup, clothing, perfume and phone accessories — all you need, all in one place. Shop 116 Dick Road, Aleshinloye Way, Ibadan." />
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="icons/icon-48.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#C9A227" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Lord & Grace Multipurpose Enterprises",
+  "alternateName": "Lagme Store",
+  "url": "https://lagme-store.onrender.com/",
+  "logo": "https://lagme-store.onrender.com/icons/icon-512.png",
+  "image": "https://lagme-store.onrender.com/icons/icon-512.png",
+  "description": "Cosmetics, toiletries, footwear, makeup, clothing, perfume and phone accessories — all you need, all in one place.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Shop 116, Dick Road, Aleshinloye Way",
+    "addressLocality": "Ibadan",
+    "addressCountry": "NG"
+  },
+  "telephone": "+2348068418941",
+  "sameAs": [
+    "https://www.facebook.com/share/19fsA89pAr/"
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -299,9 +328,25 @@
       <label>Phone number
         <input type="tel" id="checkoutPhone" required />
       </label>
-      <label>Delivery address
-        <textarea id="checkoutAddress" rows="2" required></textarea>
+      <label>State
+        <select id="checkoutState" required></select>
       </label>
+      <label>City / Area
+        <input type="text" id="checkoutCity" required placeholder="e.g. Bodija, Ibadan" />
+      </label>
+      <label>Street address (house no., street name)
+        <input type="text" id="checkoutStreet" required placeholder="e.g. 12 Awolowo Avenue" />
+      </label>
+      <label>Landmark / additional directions (optional)
+        <input type="text" id="checkoutLandmark" placeholder="e.g. opposite GTBank, blue gate" />
+      </label>
+      <label>Pin your exact delivery location
+        <input type="text" id="checkoutMapSearch" placeholder="Search for your area on the map..." />
+      </label>
+      <div id="checkoutMap" style="height:220px;border-radius:10px;margin-top:6px;"></div>
+      <p class="auth-note" id="checkoutMapHint">Drag the pin to your exact delivery spot — this helps our rider find you faster.</p>
+      <input type="hidden" id="checkoutLat" />
+      <input type="hidden" id="checkoutLng" />
     </form>
     <div class="checkout-total-row coupon-discount-row" id="checkoutDiscountRow" hidden>
       <span>Discount<span id="checkoutCouponCode"></span></span>
