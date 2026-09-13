@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-adsense-account" content="ca-pub-1176167350648115">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1176167350648115"
+     crossorigin="anonymous"></script>
   <script src="https://js.paystack.co/v1/inline.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -174,9 +175,12 @@
       <label>Stock quantity
         <input type="number" id="pfStock" min="0" value="20" required />
       </label>
-      <label>Image URL
-        <input type="text" id="pfImage" required />
+      <label>Product image
+        <input type="file" id="pfImageFile" accept="image/*" />
       </label>
+      <input type="hidden" id="pfImage" />
+      <img id="pfImagePreview" alt="" hidden style="max-width:140px;max-height:140px;border-radius:8px;margin-top:6px;object-fit:cover;" />
+      <p class="admin-gate-note" id="pfImageUploadStatus" hidden></p>
       <label>Badge (optional)
         <select id="pfBadge">
           <option value="">None</option>
@@ -203,6 +207,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
 <script src="js/config.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/db.js"></script>
