@@ -1,4 +1,5 @@
 const auth = firebase.auth();
+const storage = firebase.storage();
 
 let allProducts = [];
 let allOrders = [];
@@ -172,6 +173,15 @@ function openProductModal(id) {
     document.getElementById("pfOldPrice").value = p.oldPrice || "";
     document.getElementById("pfStock").value = typeof p.stock === "number" ? p.stock : 20;
     document.getElementById("pfImage").value = p.image || "";
+    document.getElementById("pfImageFile").value = "";
+    const previewEl = document.getElementById("pfImagePreview");
+    if (p.image) {
+      previewEl.src = p.image;
+      previewEl.hidden = false;
+    } else {
+      previewEl.hidden = true;
+    }
+    document.getElementById("pfImageUploadStatus").hidden = true;
     document.getElementById("pfBadge").value = p.badge || "";
     document.getElementById("pfDescription").value = p.description || "";
     document.getElementById("pfFlashSale").checked = !!p.flashSale;
@@ -182,6 +192,10 @@ function openProductModal(id) {
   } else {
     document.getElementById("productModalTitle").textContent = "Add product";
     document.getElementById("pfId").value = "";
+    document.getElementById("pfImage").value = "";
+    document.getElementById("pfImageFile").value = "";
+    document.getElementById("pfImagePreview").hidden = true;
+    document.getElementById("pfImageUploadStatus").hidden = true;
     document.getElementById("pfStock").value = 20;
     document.getElementById("pfFlashSale").checked = false;
     document.getElementById("pfSaleEndsWrap").hidden = true;
@@ -193,6 +207,18 @@ function openProductModal(id) {
 function closeProductModal() {
   document.getElementById("productModalOverlay").classList.remove("open");
 }
+
+document.getElementById("pfImageFile").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  const previewEl = document.getElementById("pfImagePreview");
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    previewEl.src = reader.result;
+    previewEl.hidden = false;
+  };
+  reader.readAsDataURL(file);
+});
 
 document.getElementById("pfFlashSale").addEventListener("change", (e) => {
   document.getElementById("pfSaleEndsWrap").hidden = !e.target.checked;
@@ -207,6 +233,42 @@ document.getElementById("productModalOverlay").addEventListener("click", (e) => 
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = document.getElementById("pfId").value;
+  const errEl = document.getElementById("productFormError");
+  errEl.hidden = true;
+  const statusEl = document.getElementById("pfImageUploadStatus");
+  const file = document.getElementById("pfImageFile").files[0];
+  let imageUrl = document.getElementById("pfImage").value.trim();
+
+  if (!file && !imageUrl) {
+    errEl.textContent = "Please choose a product image.";
+    errEl.hidden = false;
+    return;
+  }
+
+  const btn = document.getElementById("pfSubmitBtn");
+  btn.disabled = true;
+
+  if (file) {
+    try {
+      btn.textContent = "Uploading image...";
+      statusEl.hidden = false;
+      statusEl.textContent = "Uploading image...";
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+      const path = `products/${Date.now()}-${safeName}`;
+      const ref = storage.ref().child(path);
+      const snapshot = await ref.put(file);
+      imageUrl = await snapshot.ref.getDownloadURL();
+      statusEl.hidden = true;
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "Save product";
+      statusEl.hidden = true;
+      errEl.textContent = "Image upload failed: " + (err.message || "unknown error");
+      errEl.hidden = false;
+      return;
+    }
+  }
+
   const data = {
     name: document.getElementById("pfName").value.trim(),
     category: document.getElementById("pfCategory").value,
@@ -215,7 +277,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
       ? Number(document.getElementById("pfOldPrice").value)
       : null,
     stock: Number(document.getElementById("pfStock").value),
-    image: document.getElementById("pfImage").value.trim(),
+    image: imageUrl,
     badge: document.getElementById("pfBadge").value || null,
     description: document.getElementById("pfDescription").value.trim(),
     flashSale: document.getElementById("pfFlashSale").checked,
@@ -224,8 +286,6 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
       : null,
   };
 
-  const btn = document.getElementById("pfSubmitBtn");
-  btn.disabled = true;
   btn.textContent = "Saving...";
   try {
     if (id) {
@@ -235,8 +295,8 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     }
     closeProductModal();
   } catch (err) {
-    document.getElementById("productFormError").textContent = err.message || "Couldn't save product.";
-    document.getElementById("productFormError").hidden = false;
+    errEl.textContent = err.message || "Couldn't save product.";
+    errEl.hidden = false;
   } finally {
     btn.disabled = false;
     btn.textContent = "Save product";
